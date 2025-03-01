@@ -1,0 +1,48 @@
+
+SELECT * FROM employees 
+WHERE CAST(SUBSTRING(join_date, 1, 4) AS INT) > 2015;
+
+
+SELECT department, AVG(salary) AS avg_salary
+FROM employees GROUP BY department;
+
+
+SELECT * FROM employees WHERE project = 'Alpha';
+
+-- 4. Count Employees in Each Job Role
+SELECT job_role, COUNT(*) AS total_employees
+FROM employees GROUP BY job_role;
+
+-- 5. Employees Earning Above Department's Average Salary
+SELECT e.* FROM employees e
+JOIN (
+    SELECT department, AVG(salary) AS avg_salary
+    FROM employees GROUP BY department
+) dept_avg
+ON e.department = dept_avg.department
+WHERE e.salary > dept_avg.avg_salary;
+
+-- 6. Department with the Highest Number of Employees
+SELECT department, COUNT(*) AS total_employees
+FROM employees GROUP BY department
+ORDER BY total_employees DESC LIMIT 1;
+
+-- 7. Count of Employees with NULL Values
+SELECT COUNT(*) FROM employees 
+WHERE emp_id IS NULL OR name IS NULL OR age IS NULL 
+OR job_role IS NULL OR salary IS NULL 
+OR project IS NULL OR join_date IS NULL OR department IS NULL;
+
+-- 8. Join Employees Table with Departments Table (Get Location)
+SELECT e.*, d.location FROM employees e
+JOIN departments d ON e.department = d.department_name;
+
+-- 9. Rank Employees by Salary Within Each Department
+SELECT *, RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS salary_rank
+FROM employees;
+
+-- 10. Top 3 Highest-Paid Employees in Each Department
+SELECT * FROM (
+    SELECT *, DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS rank
+    FROM employees
+) ranked_employees WHERE rank <= 3;
